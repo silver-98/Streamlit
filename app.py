@@ -33,23 +33,25 @@ if user_city:
 
 st.header('Static Weather Information')
 static_city = "Limassol"  # Example city
-response = requests.get(f"https://ix1kkllnhl.execute-api.eu-north-1.amazonaws.com/prod/myCityFunction?city={static_city}")
+api_key = "2ebd046c30d2ce5367dc69e2ea8b1ace"  # Replace with your OpenWeatherMap API key
+
+weather_url = f"http://api.openweathermap.org/data/2.5/weather?q={static_city}&appid={api_key}&units=metric"  # units=metric for Celsius
+
+response = requests.get(weather_url)
 
 if response.status_code == 200:
     weather_data = response.json()
 
-    temp_kelvin_static = weather_data['main']['temp']
-    temp_celsius_static = temp_kelvin_static - 273.15
+    temp_celsius_static = weather_data['main']['temp']  # Temperature is already in Celsius due to units=metric
     condition_static = weather_data['weather'][0]['description']
     humidity_static = weather_data['main']['humidity']
 
     st.write(f"Weather information for {static_city}:")
-    st.metric(label="Temperature", value=f"{temp_celsius_static:.2f} °C")
+    st.metric(label="Temperature", value=f"{temp_celsius_static} °C")
     st.write(f"Condition: {condition_static}")
     st.write(f"Humidity: {humidity_static}%")
 else:
     st.error('Failed to retrieve weather data for the static city')
-
 
 # Static Currency Exchange Rates Widget
 st.header('Static Exchange Rates: USD to EUR, JPY, GBP')
@@ -78,10 +80,16 @@ base_currency = st.selectbox('Select the base currency:', ('USD', 'JPY', 'GBP', 
 target_currencies = st.multiselect('Select the target currencies:', ('USD', 'JPY', 'GBP', 'EUR'), default=['EUR'])
 
 if base_currency and target_currencies:
-    # Replace with your serverless function endpoint
     response = requests.get(f"https://paubxswj4j.execute-api.eu-north-1.amazonaws.com/default/myCurrencyFunction?base={base_currency}&targets={','.join(target_currencies)}")
     if response.status_code == 200:
         currency_data = response.json()
-        st.write('Exchange rates for', base_currency, ':', currency_data)
+
+        # Extracting the rates
+        rates = currency_data.get('rates', {})
+
+        # Display the exchange rates
+        st.write(f"Exchange rates for {base_currency}:")
+        for target, rate in rates.items():
+            st.write(f"{base_currency} to {target}: {rate}")
     else:
         st.error('Failed to retrieve currency data')
