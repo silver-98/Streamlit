@@ -3,7 +3,7 @@ import requests
 
 st.title('Weather and Currency Exchange Information App')
 
-st.header('Interactive Information Widgets')
+st.header('Interactive Information Widget')
 
 st.subheader('Get Weather Information for a City')
 user_city = st.text_input('Enter a city:')
@@ -30,7 +30,8 @@ if user_city:
         loading_message.error('Failed to retrieve weather data')
         # st.error('Failed to retrieve weather data')
 
-
+st.markdown('<style>hr{border-top: 2px solid #ff5733;}</style>', unsafe_allow_html=True)
+st.markdown("<hr>", unsafe_allow_html=True)
 st.header('Static Weather Information')
 static_city = "Limassol"  # Example city
 api_key = "2ebd046c30d2ce5367dc69e2ea8b1ace"  # Replace with your OpenWeatherMap API key
@@ -54,29 +55,33 @@ else:
     st.error('Failed to retrieve weather data for the static city')
 
 # Static Currency Exchange Rates Widget
-st.header('Static Exchange Rates: USD to EUR, JPY, GBP')
-exchange_url = 'https://openexchangerates.org/api/latest.json?app_id=1722041c5158478381ff3a2f46768640'
+st.header('Static Exchange Rates: EUR to USD, JPY, GBP')
+# exchange_url = 'https://openexchangerates.org/api/latest.json?app_id=1722041c5158478381ff3a2f46768640'
+exchange_url = 'http://api.exchangeratesapi.io/v1/latest?access_key=3221c0c3014b2c98fac97cf254f1a546&base=EUR&symbols=USD,JPY,GBP'
+
 exchange_response = requests.get(exchange_url)
 
 if exchange_response.status_code == 200:
     exchange_data = exchange_response.json()
 
-    # Extracting specific data
-    usd_to_eur = exchange_data['rates']['EUR']
-    usd_to_jpy = exchange_data['rates']['JPY']
-    usd_to_gbp = exchange_data['rates']['GBP']
+    eur_to_usd = exchange_data['rates']['USD']
+    eur_to_jpy = exchange_data['rates']['JPY']
+    eur_to_gbp = exchange_data['rates']['GBP']
 
     # Displaying the extracted data
-    st.write('USD to EUR:', usd_to_eur)
-    st.write('USD to JPY:', usd_to_jpy)
-    st.write('USD to GBP:', usd_to_gbp)
+    st.write('EUR to USD:', eur_to_usd)
+    st.write('EUR to JPY:', eur_to_jpy)
+    st.write('EUR to GBP:', eur_to_gbp)
 else:
     st.error('Failed to retrieve exchange rates')
 
-
+st.markdown('<style>hr{border-top: 2px solid #ff5733;}</style>', unsafe_allow_html=True)
+st.markdown("<hr>", unsafe_allow_html=True)
 # User input for currency information
 st.subheader('Currency Conversion')
-base_currency = st.selectbox('Select the base currency:', ('USD', 'JPY', 'GBP', 'EUR'))
+# base_currency = st.selectbox('Select the base currency:', ('USD', 'JPY', 'GBP', 'EUR'))
+base_currency = st.selectbox('Base currency:', ('EUR',))
+
 target_currencies = st.multiselect('Select the target currencies:', ('USD', 'JPY', 'GBP', 'EUR'), default=['EUR'])
 
 if base_currency and target_currencies:
@@ -93,3 +98,6 @@ if base_currency and target_currencies:
             st.write(f"{base_currency} to {target}: {rate}")
     else:
         st.error('Failed to retrieve currency data')
+
+
+
