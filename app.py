@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-
+import time
 st.title('Weather and Currency Exchange Information App')
 
 st.header('Interactive Information Widget')
@@ -34,16 +34,16 @@ st.markdown('<style>hr{border-top: 2px solid #ff5733;}</style>', unsafe_allow_ht
 st.markdown("<hr>", unsafe_allow_html=True)
 st.header('Static Weather Information')
 static_city = "Limassol"  # Example city
-api_key = "2ebd046c30d2ce5367dc69e2ea8b1ace"  # Replace with your OpenWeatherMap API key
+api_key = "2ebd046c30d2ce5367dc69e2ea8b1ace"  
 
-weather_url = f"http://api.openweathermap.org/data/2.5/weather?q={static_city}&appid={api_key}&units=metric"  # units=metric for Celsius
+weather_url = f"http://api.openweathermap.org/data/2.5/weather?q={static_city}&appid={api_key}&units=metric"  
 
 response = requests.get(weather_url)
 
 if response.status_code == 200:
     weather_data = response.json()
 
-    temp_celsius_static = weather_data['main']['temp']  # Temperature is already in Celsius due to units=metric
+    temp_celsius_static = weather_data['main']['temp']  
     condition_static = weather_data['weather'][0]['description']
     humidity_static = weather_data['main']['humidity']
 
@@ -54,7 +54,7 @@ if response.status_code == 200:
 else:
     st.error('Failed to retrieve weather data for the static city')
 
-# Static Currency Exchange Rates Widget
+
 st.header('Static Exchange Rates: EUR to USD, JPY, GBP')
 # exchange_url = 'https://openexchangerates.org/api/latest.json?app_id=1722041c5158478381ff3a2f46768640'
 exchange_url = 'http://api.exchangeratesapi.io/v1/latest?access_key=3221c0c3014b2c98fac97cf254f1a546&base=EUR&symbols=USD,JPY,GBP'
@@ -77,7 +77,7 @@ else:
 
 st.markdown('<style>hr{border-top: 2px solid #ff5733;}</style>', unsafe_allow_html=True)
 st.markdown("<hr>", unsafe_allow_html=True)
-# User input for currency information
+
 st.subheader('Currency Conversion')
 # base_currency = st.selectbox('Select the base currency:', ('USD', 'JPY', 'GBP', 'EUR'))
 base_currency = st.selectbox('Base currency:', ('EUR',))
@@ -85,20 +85,25 @@ base_currency = st.selectbox('Base currency:', ('EUR',))
 target_currencies = st.multiselect('Select the target currencies:', ('USD', 'JPY', 'GBP', 'EUR'), default=['EUR'])
 
 if base_currency and target_currencies:
-    loading_message = st.empty()
-    loading_message.text('Loading currency data...')
+    start_time = time.time()
+    loading_message2 = st.empty()
+    loading_message2.text('Loading currency data...')
     response = requests.get(f"https://paubxswj4j.execute-api.eu-north-1.amazonaws.com/default/myCurrencyFunction?base={base_currency}&targets={','.join(target_currencies)}")
+    end_time = time.time()
+    execution_time = end_time - start_time
+
     if response.status_code == 200:
-        loading_message.success('Successfully fetched currency data')
+        loading_message2.success('Successfully fetched currency data')
         currency_data = response.json()
 
-        # Extracting the rates
         rates = currency_data.get('rates', {})
 
         # Display the exchange rates
         st.write(f"Exchange rates for {base_currency}:")
         for target, rate in rates.items():
             st.write(f"{base_currency} to {target}: {rate}")
+        st.write(f"Execution time: {execution_time:.2f} seconds")
+
     else:
         st.error('Failed to retrieve currency data')
 
