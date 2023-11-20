@@ -85,8 +85,11 @@ base_currency = st.selectbox('Base currency:', ('EUR',))
 target_currencies = st.multiselect('Select the target currencies:', ('USD', 'JPY', 'GBP', 'EUR'), default=['EUR'])
 
 if base_currency and target_currencies:
+    loading_message = st.empty()
+    loading_message.text('Loading currency data...')
     response = requests.get(f"https://paubxswj4j.execute-api.eu-north-1.amazonaws.com/default/myCurrencyFunction?base={base_currency}&targets={','.join(target_currencies)}")
     if response.status_code == 200:
+        loading_message.success('Successfully fetched currency data')
         currency_data = response.json()
 
         # Extracting the rates
